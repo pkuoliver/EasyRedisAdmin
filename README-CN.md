@@ -10,5 +10,5 @@ php web redis admin
 
 本项目基于predis，隐藏在使用前，需要先安装[predis](https://github.com/nrk/predis)
 ```
-composer require mongodb/mongodb
+composer require predis/predis
 ```

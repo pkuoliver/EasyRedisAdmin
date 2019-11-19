@@ -11,5 +11,5 @@ I do something refine:
 
 This project is baseed on [predis](https://github.com/nrk/predis), you need install predis before used it.
 ```
-composer require mongodb/mongodb
+composer require predis/predis
 ```
