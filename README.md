@@ -5,11 +5,8 @@ This project is based on [erikdubbelboer/phpRedisAdmin](https://github.com/ErikD
 
 I do something refine:
 ====
+* The PRedis dependency has been removed, making it more efficient.
 * Support json format.
 * Add more information for server item.
 * Refine UI.
-
-This project is baseed on [predis](https://github.com/nrk/predis), you need install predis before used it.
-```
-composer require predis/predis
-```
+* Refine code.

@@ -15,10 +15,9 @@ if (!isset($_GET['key'])) {
 	require 'includes/footer.inc.php';
 	die;
 }
-
-$type   = $redis->type($_GET['key']);
+$typeMap = array(0=>'nont', 1=>'string', 2=>'set', 3=>'list', 4=>'zset', 5=>'hash');
+$type   = $typeMap[$redis->type($_GET['key'])];
 $exists = $redis->exists($_GET['key']);
-
 $count_elements_page = isset($config['count_elements_page']) ? $config['count_elements_page'] : false;
 $page_num_request    = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $page_num_request    = $page_num_request === 0 ? 1 : $page_num_request;

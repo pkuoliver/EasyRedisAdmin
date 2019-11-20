@@ -8,20 +8,14 @@ if($redis) {
 		$next = 0;
 		$keys = array();
 
-		while (true) {
-			$r = $redis->scan($next, 'MATCH', $server['filter'], 'COUNT', $server['scansize']);
-
-			$next = $r[0];
-			$keys = array_merge($keys, $r[1]);
-
-			if ($next == 0) {
-				break;
-			}
+		$redis->setOption(Redis::OPT_SCAN,Redis::SCAN_RETRY);
+		$iterator = null;
+		while ($r = $redis->scan($iterator, $server['filter'])) {
+			$keys = array_merge($keys, $r);
 		}
 	}
 
 	sort($keys);
-
 	$namespaces = array(); // Array to hold our top namespaces.
 
 	// Build an array of nested arrays containing all our namespaces and containing keys.

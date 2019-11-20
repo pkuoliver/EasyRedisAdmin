@@ -1,7 +1,6 @@
 <?php
-require dirname(__FILE__) . '/../vendor/autoload.php';
 
-define('PHPREDIS_ADMIN_PATH', dirname(__DIR__));
+define('EASY_REDIS_ADMIN_PATH', dirname(__DIR__));
 
 // Undo magic quotes (both in keys and values)
 if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc()) {
@@ -25,16 +24,16 @@ if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc()) {
 
 
 // These includes are needed by each script.
-if(file_exists(PHPREDIS_ADMIN_PATH . '/includes/config.inc.php')){
-	require_once PHPREDIS_ADMIN_PATH . '/includes/config.inc.php';
+if(file_exists(EASY_REDIS_ADMIN_PATH . '/includes/config.inc.php')){
+	require_once EASY_REDIS_ADMIN_PATH . '/includes/config.inc.php';
 }else{
-	require_once PHPREDIS_ADMIN_PATH . '/includes/config.sample.inc.php';
+	require_once EASY_REDIS_ADMIN_PATH . '/includes/config.sample.inc.php';
 }
-require_once PHPREDIS_ADMIN_PATH . '/includes/functions.inc.php';
-require_once PHPREDIS_ADMIN_PATH . '/includes/page.inc.php';
+require_once EASY_REDIS_ADMIN_PATH . '/includes/functions.inc.php';
+require_once EASY_REDIS_ADMIN_PATH . '/includes/page.inc.php';
 
 if (isset($config['login'])) {
-	require_once PHPREDIS_ADMIN_PATH . '/includes/login.inc.php';
+	require_once EASY_REDIS_ADMIN_PATH . '/includes/login.inc.php';
 }
 
 
@@ -110,16 +109,19 @@ if (!isset($server['serialization'])) {
 }
 
 // Setup a connection to Redis.
-if(isset($server['scheme']) && $server['scheme'] === 'unix' && $server['path']) {
-	$redis = new Predis\Client(array('scheme' => 'unix', 'path' => $server['path']));
-} else {
-	$redis = !$server['port'] ? new Predis\Client($server['host']) : new Predis\Client('tcp://'.$server['host'].':'.$server['port']);
-}
-
 try {
-		$redis->connect();
-} catch (Predis\CommunicationException $exception) {
-		die('ERROR: ' . $exception->getMessage());
+	$redisHost = '127.0.0.1';
+	$redisPort = '6379';
+	$redis = new Redis();
+	if(!$server['port']) {
+		$redisHost = $server['host'];
+	} else {
+		$redisHost = $server['host'];
+		$redisPort = $server['port'];
+	}
+	$redis->connect($redisHost, $redisPort);
+} catch (Exception $exception) {
+	die('ERROR: ' . $exception->getMessage());
 }
 
 if (isset($server['auth'])) {

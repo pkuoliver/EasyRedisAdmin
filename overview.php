@@ -9,14 +9,19 @@ foreach ($config['servers'] as $i => $server) {
 	}
 
 	// Setup a connection to Redis.
-	if(isset($server['scheme']) && $server['scheme'] === 'unix' && $server['path']) {
-		$redis = new Predis\Client(array('scheme' => 'unix', 'path' => $server['path']));
-	} else {
-		$redis = !$server['port'] ? new Predis\Client($server['host']) : new Predis\Client('tcp://'.$server['host'].':'.$server['port']);
-	}
 	try {
-		$redis->connect();
-	} catch (Predis\CommunicationException $exception) {
+		$redisHost = '127.0.0.1';
+		$redisPort = '6379';
+		$redis = new Redis();
+		if(!$server['port']) {
+			$redisHost = $server['host'];
+		} else {
+			$redisHost = $server['host'];
+			$redisPort = $server['port'];
+		}
+		$redis->connect($redisHost, $redisPort);
+	} catch (Exception $exception) {
+		die('ERROR: ' . $exception->getMessage());
 		$redis = false;
 	}
 
@@ -69,9 +74,9 @@ require 'includes/header.inc.php';
 
 		<table>
 			<tr><td><div>Host:</div></td><td><div><?php echo $info[$i]['Server']['host']?></div></td></tr>
-			<tr><td><div>Port:</div></td><td><div><?php echo $info[$i]['Server']['tcp_port']?></div></td></tr>
+			<tr><td><div>Port:</div></td><td><div><?php echo $info[$i]['tcp_port']?></div></td></tr>
 			<tr><td><div>Keys:</div></td><td><div><?php echo $info[$i]['size']?></div></td></tr>
-			<tr><td><div>Clients:</div></td><td><div><?php echo $info[$i]['Clients']['connected_clients']?></div></td></tr>
+			<tr><td><div>Clients:</div></td><td><div><?php echo $info[$i]['connected_clients']?></div></td></tr>
 			<tr><td><div>Memory</div></td><td><div><?php echo format_size($info[$i]['Memory']['used_memory'])?></div></td></tr>
 			<tr><td><div>Version:</div></td><td><div><?php echo $info[$i]['Server']['redis_version']?></div></td></tr>
 			<tr><td><div>Uptime:</div></td><td><div><?php echo format_time($info[$i]['Server']['uptime_in_seconds'])?></div></td></tr>
