@@ -29,3 +29,4 @@ unzip master.zip
 
 * 优化UI展示，改善CURD操作的便捷性；
 * 添加Redis各个实例的实时监控；
+* 添加多语言支持。

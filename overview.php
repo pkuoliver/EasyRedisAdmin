@@ -41,19 +41,7 @@ foreach ($config['servers'] as $i => $server) {
 
 		$info[$i]         = $redis->info();
 		$info[$i]['size'] = $redis->dbSize();
-
-		if (!isset($info[$i]['Server'])) {
-			$info[$i]['Server'] = array(
-				'redis_version'     => $info[$i]['redis_version'],
-				'uptime_in_seconds' => $info[$i]['uptime_in_seconds']
-			);
-		}
-		$info[$i]['Server']['host'] = $server['host'];
-		if (!isset($info[$i]['Memory'])) {
-			$info[$i]['Memory'] = array(
-				'used_memory' => $info[$i]['used_memory']
-			);
-		}
+		$info[$i]['host'] = $server['host'];
 	}
 }
 
@@ -73,20 +61,20 @@ require 'includes/header.inc.php';
 		<?php else: ?>
 
 		<table>
-			<tr><td><div>Host:</div></td><td><div><?php echo $info[$i]['Server']['host']?></div></td></tr>
+			<tr><td><div>Host:</div></td><td><div><?php echo $info[$i]['host']?></div></td></tr>
 			<tr><td><div>Port:</div></td><td><div><?php echo $info[$i]['tcp_port']?></div></td></tr>
 			<tr><td><div>Keys:</div></td><td><div><?php echo $info[$i]['size']?></div></td></tr>
 			<tr><td><div>Clients:</div></td><td><div><?php echo $info[$i]['connected_clients']?></div></td></tr>
-			<tr><td><div>Memory</div></td><td><div><?php echo format_size($info[$i]['Memory']['used_memory'])?></div></td></tr>
-			<tr><td><div>Version:</div></td><td><div><?php echo $info[$i]['Server']['redis_version']?></div></td></tr>
-			<tr><td><div>Uptime:</div></td><td><div><?php echo format_time($info[$i]['Server']['uptime_in_seconds'])?></div></td></tr>
+			<tr><td><div>Memory</div></td><td><div><?php echo format_size($info[$i]['used_memory'])?></div></td></tr>
+			<tr><td><div>Version:</div></td><td><div><?php echo $info[$i]['redis_version']?></div></td></tr>
+			<tr><td><div>Uptime:</div></td><td><div><?php echo format_time($info[$i]['uptime_in_seconds'])?></div></td></tr>
 			<tr><td><div style="min-width:70px;">Last save:</div></td><td><div style="min-width:100px;">
 			<?php
-				if (isset($info[$i]['Persistence']['rdb_last_save_time'])) {
-					if((time() - $info[$i]['Persistence']['rdb_last_save_time'] ) >= 0) {
-						echo format_time(time() - $info[$i]['Persistence']['rdb_last_save_time']) . " ago";
+				if (isset($info[$i]['rdb_last_save_time'])) {
+					if((time() - $info[$i]['rdb_last_save_time'] ) >= 0) {
+						echo format_time(time() - $info[$i]['rdb_last_save_time']) . " ago";
 					} else {
-						echo format_time(-(time() - $info[$i]['Persistence']['rdb_last_save_time'])) . "in the future";
+						echo format_time(-(time() - $info[$i]['rdb_last_save_time'])) . "in the future";
 					}
 				} else {
 					echo 'never';

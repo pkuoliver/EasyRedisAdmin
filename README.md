@@ -24,3 +24,4 @@ After installed, you can copy includes/config.sample.php and edit your instance 
 ## TODO
 * Optimize UI presentation and improve the convenience of CURD operations.
 * Add real-time monitoring for each instance.
+* Add multi-language support.
