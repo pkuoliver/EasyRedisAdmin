@@ -23,7 +23,7 @@ wget https://github.com/pkuoliver/EasyRedisAdmin/archive/master.zip
 unzip master.zip
 ~~~
 
-安装之后，你需要复制一份includes/config.sample.php，然后添加你的Redis实例信息，以及登录信息。
+安装之后，你需要复制一份includes/config.sample.inc.php，然后添加你的Redis实例信息，以及登录信息。
 
 ## 未来计划
 

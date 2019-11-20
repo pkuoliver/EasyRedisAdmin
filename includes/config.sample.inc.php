@@ -52,7 +52,7 @@ $config = array(
 		),
 		'guest' => array(
 			'password' => '',
-			'servers'  => array(1) // Optional list of servers this user can access.
+			'servers'  => array(0) // Optional list of servers this user can access.
 		)
 	),*/
 
