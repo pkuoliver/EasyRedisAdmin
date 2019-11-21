@@ -1,5 +1,5 @@
 # EasyRedisAdmin
-PHP web redis admin. [中文版说明](./README-CN.md)
+Make redis management easier. This project is for redis admin by php. [中文版说明](./README-CN.md)
 
 This project is based on [erikdubbelboer/phpRedisAdmin](https://github.com/ErikDubbelboer/phpRedisAdmin) Ver1.11.5. phpRedisAdmin is a great project, thanks.
 
