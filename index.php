@@ -10,14 +10,18 @@ if($redis) {
 		
 		$maxCnt = -1; if(isset($config['max_keys_to_show'])) $maxCnt = $config['max_keys_to_show'];
 		$showAll = true;
-		$redis->setOption(Redis::OPT_SCAN,Redis::SCAN_RETRY);
+		$redis->setOption(Redis::OPT_SCAN, Redis::SCAN_RETRY);
 		$iterator = null;
-		while ($r = $redis->scan($iterator, $server['filter'])) {
-			$keys = array_merge($keys, $r);
-			if($maxCnt != -1 && count($keys) > $maxCnt) {
-				$showAll = false;
-				break;
+		try {
+			while ($r = $redis->scan($iterator, $server['filter'])) {
+				$keys = array_merge($keys, $r);
+				if($maxCnt != -1 && count($keys) > $maxCnt) {
+					$showAll = false;
+					break;
+				}
 			}
+		} catch (RedisException $exp) {
+			die('Redis('.$server['host'].':'.$server['port'].') scan err. Detail: '. $exp->getMessage());
 		}
 	}
 
