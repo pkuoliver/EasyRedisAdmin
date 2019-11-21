@@ -42,6 +42,8 @@ $config = array(
 	// Uncomment to show less information and make EasyRedisAdmin fire less commands to the Redis server. Recommended for a really busy Redis server.
 	//'faster' => true,
 
+	// Show detail size, if faster is false && show_detail_size is true, we will calc relatively accurate memory consumption for each key, or just estimate each key memory
+	//'show_detail_memory' => true,
 
 	// Uncomment to enable HTTP authentication
 	/*'login' => array(
@@ -80,4 +82,8 @@ $config = array(
 
 	// How many entries to fetch using each SCAN command.
 	'scansize' => 1000
+
+	// Max keys count to show, If your redis does not show up because there are too many keys, you can lower the value appropriately.
+	// Default value is -1, means no limits.
+    //'max_keys_to_show' => -1,
 );

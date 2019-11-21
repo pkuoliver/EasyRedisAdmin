@@ -4,6 +4,7 @@ PHP web redis admin. [中文版说明](./README-CN.md)
 This project is based on [erikdubbelboer/phpRedisAdmin](https://github.com/ErikDubbelboer/phpRedisAdmin) Ver1.11.5. phpRedisAdmin is a great project, thanks.
 
 ## What works did i do
+* Estimated memory consumption for each key and folder.
 * Remove Predis dependency, making it more efficient.
 * Support json format.
 * Add more information for each instance item.

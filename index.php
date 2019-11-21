@@ -7,11 +7,17 @@ if($redis) {
 	} else {
 		$next = 0;
 		$keys = array();
-
+		
+		$maxCnt = -1; if(isset($config['max_keys_to_show'])) $maxCnt = $config['max_keys_to_show'];
+		$showAll = true;
 		$redis->setOption(Redis::OPT_SCAN,Redis::SCAN_RETRY);
 		$iterator = null;
 		while ($r = $redis->scan($iterator, $server['filter'])) {
 			$keys = array_merge($keys, $r);
+			if($maxCnt != -1 && count($keys) > $maxCnt) {
+				$showAll = false;
+				break;
+			}
 		}
 	}
 
@@ -51,7 +57,7 @@ if($redis) {
 	// Recursive function used to print the namespaces.
 	function print_namespace($item, $name, $fullkey, $islast) {
 		global $config, $server, $redis;
-
+		$totalSize = 0;
 		// Is this also a key and not just a namespace?
 		if (isset($item['__EasyRedisAdmin__'])) {
 			// Unset it so we won't loop over it when printing this namespace.
@@ -59,6 +65,7 @@ if($redis) {
 
 			$class = array();
 			$len   = false;
+			$size  = 0;
 
 			if (isset($_GET['key']) && ($fullkey == $_GET['key'])) {
 				$class[] = 'current';
@@ -67,35 +74,48 @@ if($redis) {
 				$class[] = 'last';
 			}
 
+			$calcDetailMem = $config['show_detail_memory'];
 			// Get the number of items in the key.
 			if (!isset($config['faster']) || !$config['faster']) {
 				switch ($redis->type($fullkey)) {
-					case 'hash':
+					case 1: //string
+						$len = 1;
+						if($calcDetailMem) $size = 40 + strlen($fullkey) + $redis->strLen($fullkey);
+						else $size = 40 + strlen($fullkey) + 100; //assume value size is 100
+						break;
+					case 5: //hash
 						$len = $redis->hLen($fullkey);
+						if($calcDetailMem) $size = 40 + strlen($fullkey) + $len * 114;
+						else $size = 40 + strlen($fullkey) + $len * 114;
 						break;
-
-					case 'list':
+					case 3: //list
 						$len = $redis->lLen($fullkey);
+						if($calcDetailMem) $size = 40 + strlen($fullkey) + $len * 114;
+						else $size = 40 + strlen($fullkey) + $len * 114;
 						break;
-
-					case 'set':
+					case 2: //set
 						$len = $redis->sCard($fullkey);
+						if($calcDetailMem) $size = 40 + strlen($fullkey) + $len * 100;
+						else $size = $size = 40 + strlen($fullkey) + $len * 100;
 						break;
-
-					case 'zset':
+					case 4: //zset
 						$len = $redis->zCard($fullkey);
+						if($calcDetailMem) $size = 40 + strlen($fullkey) + $len * 114;
+						else $size = $size = 40 + strlen($fullkey) + $len * 114;
 						break;
 				}
 			}
+			$totalSize = $size;
 
-			if (empty($name)) {
+			if ($name != '0' && empty($name)) {
 				$name = '<empty>';
 			}
 
 			?>
 			<li<?php echo empty($class) ? '' : ' class="'.implode(' ', $class).'"'?>>
 			<input type="checkbox" name="checked_keys" value="<?php echo $fullkey?>"/>
-			<a href="?view&amp;s=<?php echo $server['id']?>&amp;d=<?php echo $server['db']?>&amp;key=<?php echo urlencode($fullkey)?>"><?php echo format_html($name)?><?php if ($len !== false) { ?><span class="info">(<?php echo $len?>)</span><?php } ?></a>
+			<a href="?view&amp;s=<?php echo $server['id']?>&amp;d=<?php echo $server['db']?>&amp;key=<?php echo urlencode($fullkey)?>"><?php echo format_html($name)?>
+				<?php if ($len !== false) { ?><span class="info">(<?php echo $len . '/' . format_size($size) ?>)</span><?php } ?></a>
 			</li>
 			<?php
 		}
@@ -104,30 +124,38 @@ if($redis) {
 		if (count($item) > 0) {
 			?>
 			<li class="folder<?php echo ($fullkey === '') ? '' : ' collapsed'?><?php echo $islast ? ' last' : ''?>">
-			<div class="icon"><?php echo format_html($name)?>&nbsp;<span class="info">(<?php echo count($item)?>)</span>
-			<?php if ($fullkey !== '') { ?><a href="delete.php?s=<?php echo $server['id']?>&amp;d=<?php echo $server['db']?>&amp;tree=<?php echo urlencode($fullkey).$server['seperator']?>" class="deltree"><img src="images/delete.png" width="10" height="10" title="Delete tree" alt="[X]"></a><?php } ?>
-			</div><ul>
-			<?php
+				<div class="icon">
+					<?php echo format_html($name)?>&nbsp;<span class="info">(<?php echo count($item)?>)</span>
+					<?php if ($fullkey !== '') { ?>
+						<a href="delete.php?s=<?php echo $server['id']?>&amp;d=<?php echo $server['db']?>&amp;tree=<?php echo urlencode($fullkey).$server['seperator']?>" class="deltree">
+							<img src="images/delete.png" width="10" height="10" title="Delete tree" alt="[X]">
+						</a>
+					<?php } ?>
+				</div>
+				<ul>
+					<?php
+					$l = count($item);
+					foreach ($item as $childname => $childitem) {
+						// $fullkey will be empty on the first call.
+						if ($fullkey === '') {
+							$childfullkey = $childname;
+						} else {
+							$childfullkey = $fullkey.$server['seperator'].$childname;
+						}
 
-			$l = count($item);
-
-			foreach ($item as $childname => $childitem) {
-				// $fullkey will be empty on the first call.
-				if ($fullkey === '') {
-					$childfullkey = $childname;
-				} else {
-					$childfullkey = $fullkey.$server['seperator'].$childname;
-				}
-
-				print_namespace($childitem, $childname, $childfullkey, (--$l == 0));
-			}
-
-			?>
-			</ul>
+						$totalSize = $totalSize + print_namespace($childitem, $childname, $childfullkey, (--$l == 0));
+					}
+					?>
+				</ul>
+				<?php if(!isset($config['faster']) || !$config['faster']){ ?>
+					<span style="position:absolute; top:0; right:20px;" class="info">(<?php echo format_size($totalSize)?>)</span>
+				<?php } ?>
 			</li>
 			<?php
 		}
-	}
+
+		return $totalSize;
+	}// print_namespace
 
 } // if redis
 
