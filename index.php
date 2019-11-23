@@ -50,9 +50,8 @@ if($redis) {
 			$d = &$d[$key[$i]];
 		}
 
-		// Nodes containing an item named __EasyRedisAdmin__ are also a key, not just a directory.
-		// This means that creating an actual key named __EasyRedisAdmin__ will make this bug.
-		$d[$key[count($key) - 1]] = array('__EasyRedisAdmin__' => true);
+		// Node value is TRUE means it's a key, not just a directory.
+		$d[$key[count($key) - 1]] = TRUE;
 
 		// Unset $d so we don't accidentally overwrite it somewhere else.
 		unset($d);
@@ -64,9 +63,9 @@ if($redis) {
 		$totalSize = 0;
 		$keyCount = 1;
 		// Is this also a key and not just a namespace?
-		if (isset($item['__EasyRedisAdmin__'])) {
+		if ($item === TRUE) {
 			// Unset it so we won't loop over it when printing this namespace.
-			unset($item['__EasyRedisAdmin__']);
+			unset($item);
 
 			$class = array();
 			$len   = false;
@@ -146,7 +145,7 @@ if($redis) {
 		}
 
 		// Does this namespace also contain subkeys?
-		if (count($item) > 0) {
+		if (isset($item) && count($item) > 0) {
 			$keyCount = 0;
 			?>
 			<li class="folder<?php echo ($fullkey === '') ? '' : ' collapsed'?><?php echo $islast ? ' last' : ''?>">
