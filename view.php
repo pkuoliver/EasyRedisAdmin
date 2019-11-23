@@ -63,15 +63,18 @@ switch ($type) {
 		break;
 	case 'hash'://这里误差会比较大，没有计算实际value的值
 		$values = $redis->hGetAll($key);
-		$valSize = 0;
+		$entrySize = 0;
 		foreach ($values as $k => $value) {
 			$values[$k] = encodeOrDecode('load', $key, $value);
-			$valSize = $valSize + (40 + 2*strlen($k)) + (40 + 2*strlen($value));
+
+			// dictEntry size
+			$entrySize = $entrySize + 24 + strlen($k) + strlen($value);
 		}
 		$size = count($values);
 		ksort($values);
-
-		$memory = 40 + 2*strlen($key) + $valSize;
+		
+		//        $keyMem             + dicthtMem + bucketMem            + dictEntryMem
+		$memory = 40 + 2*strlen($key) + 4*8       + 8*calcMaxSize($size) + $entrySize;
 		break;
 	case 'list':
 		$size = $redis->lLen($key);

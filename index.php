@@ -62,6 +62,7 @@ if($redis) {
 	function print_namespace($item, $name, $fullkey, $islast) {
 		global $config, $server, $redis;
 		$totalSize = 0;
+		$keyCount = 1;
 		// Is this also a key and not just a namespace?
 		if (isset($item['__EasyRedisAdmin__'])) {
 			// Unset it so we won't loop over it when printing this namespace.
@@ -77,9 +78,9 @@ if($redis) {
 			if ($islast) {
 				$class[] = 'last';
 			}
-
 			$calcDetailMem = $config['show_detail_memory'];
 			// Get the number of items in the key.
+			// Mem comsumption algorithom from : https://www.cnblogs.com/kismetv/p/8654978.html
 			if (!isset($config['faster']) || !$config['faster']) {
 				switch ($redis->type($fullkey)) {
 					case 1: //string
@@ -89,8 +90,28 @@ if($redis) {
 						break;
 					case 5: //hash
 						$len = $redis->hLen($fullkey);
-						if($calcDetailMem) $size = 40 + strlen($fullkey) + $len * 114;
-						else $size = 40 + strlen($fullkey) + $len * 114;
+						if($calcDetailMem) {
+							$avgEntryMem = 114;
+							/*$iter = null;
+							$scanSize = $len/20 > 5 ? $len/20 : 5;
+							$total = 0; $cnt = 0;
+							while($r = $redis->hScan($fullkey, $iter, '*', $scanSize)) {
+								if($r === false) break;
+								foreach($r as $k) {
+									$vl = $redis->hStrLen($fullkey, $k);
+									$total = $total + (32 + 40 + strlen($k) + $vl);
+									if($vl>39) $total = $total + 40;
+									$cnt++;
+								}
+								//if($cnt >= $scanSize) break;
+							}
+							$avgEntryMem = $total / $cnt;
+							var_dump($avgEntryMem);*/
+							$size = 40 + strlen($fullkey) + 8*calcMaxSize($len) + $len * $avgEntryMem;
+						} else {
+							$size = 40 + strlen($fullkey) + 8*calcMaxSize($len) + $len * 114;
+							//else $size = 40 + strlen($fullkey) + 8*2*$len + $len * 114;
+						}
 						break;
 					case 3: //list
 						$len = $redis->lLen($fullkey);
@@ -117,15 +138,16 @@ if($redis) {
 
 			?>
 			<li<?php echo empty($class) ? '' : ' class="'.implode(' ', $class).'"'?>>
-			<input type="checkbox" name="checked_keys" value="<?php echo $fullkey?>"/>
-			<a href="?view&amp;s=<?php echo $server['id']?>&amp;d=<?php echo $server['db']?>&amp;key=<?php echo urlencode($fullkey)?>"><?php echo format_html($name)?>
-				<?php if ($len !== false) { ?><span class="info">(<?php echo $len . '/' . format_size($size) ?>)</span><?php } ?></a>
+				<input type="checkbox" name="checked_keys" value="<?php echo $fullkey?>"/>
+				<a href="?view&amp;s=<?php echo $server['id']?>&amp;d=<?php echo $server['db']?>&amp;key=<?php echo urlencode($fullkey)?>"><?php echo format_html($name)?>
+					<?php if ($len !== false) { ?><span class="info">(<?php echo $len . '/' . format_size($size) ?>)</span><?php } ?></a>
 			</li>
 			<?php
 		}
 
 		// Does this namespace also contain subkeys?
 		if (count($item) > 0) {
+			$keyCount = 0;
 			?>
 			<li class="folder<?php echo ($fullkey === '') ? '' : ' collapsed'?><?php echo $islast ? ' last' : ''?>">
 				<div class="icon">
@@ -146,19 +168,20 @@ if($redis) {
 						} else {
 							$childfullkey = $fullkey.$server['seperator'].$childname;
 						}
-
-						$totalSize = $totalSize + print_namespace($childitem, $childname, $childfullkey, (--$l == 0));
+						$rst = print_namespace($childitem, $childname, $childfullkey, (--$l == 0));
+						$keyCount = $keyCount + $rst['size'];
+						$totalSize = $totalSize + $rst['mem'];
 					}
 					?>
 				</ul>
 				<?php if(!isset($config['faster']) || !$config['faster']){ ?>
-					<span style="position:absolute; top:0; right:20px;" class="info">(<?php echo format_size($totalSize)?>)</span>
+					<span class="info float-right-info">(<?php echo $keyCount . '/' . format_size($totalSize)?>)</span>
 				<?php } ?>
 			</li>
 			<?php
 		}
 
-		return $totalSize;
+		return array('size'=>$keyCount, 'mem'=>$totalSize);
 	}// print_namespace
 
 } // if redis

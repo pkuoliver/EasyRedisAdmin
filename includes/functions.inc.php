@@ -30,16 +30,13 @@ function format_time($time, $ago = false) {
 	$minute = 60;
 	$hour   = $minute * 60;
 	$day    = $hour   * 24;
-
 	$when = $time;
-
 	if ($when >= 0)
 		$suffix = 'ago';
 	else {
 		$when = -$when;
 		$suffix = 'in the future';
 	}
-
 	if ($when > $day) {
 		$when = round($when / $day);
 		$what = 'day';
@@ -52,9 +49,7 @@ function format_time($time, $ago = false) {
 	} else {
 		$what = 'second';
 	}
-
 	if ($when != 1) $what .= 's';
-
 	if ($ago) {
 		return "$when $what $suffix";
 	} else {
@@ -112,4 +107,10 @@ function encodeOrDecode($action, $key, $data) {
 
 function getRelativePath($base) {
 	return substr($_SERVER['REQUEST_URI'], strpos($_SERVER['REQUEST_URI'], $base));
+}
+
+function calcMaxSize($size) {
+	$r = log($size, 2);
+	$r = ceil($r); //上取整
+	return pow(2, $r);
 }
