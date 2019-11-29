@@ -81,7 +81,7 @@ $config = array(
 	'keys' => false,
 
 	// How many entries to fetch using each SCAN command.
-	'scansize' => 1000,
+	'scansize' => 1000
 
 	// Max keys count to show, If your redis does not show up because there are too many keys, you can lower the value appropriately.
 	// Default value is -1, means no limits.
