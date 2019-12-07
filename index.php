@@ -44,14 +44,14 @@ if($redis) {
 		// Each time updating $d to be a reference to the last namespace so we can create the next one in it.
 		for ($i = 0; $i < (count($key) - 1); ++$i) {
 			if (!isset($d[$key[$i]])) {
-				$d[$key[$i]] = array();
+				if(is_array($d)) $d[$key[$i]] = array();
 			}
 
-			$d = &$d[$key[$i]];
+			if(is_array($d)) $d = &$d[$key[$i]];
 		}
 
 		// Node value is TRUE means it's a key, not just a directory.
-		$d[$key[count($key) - 1]] = TRUE;
+		if(is_array($d)) $d[$key[count($key) - 1]] = TRUE;
 
 		// Unset $d so we don't accidentally overwrite it somewhere else.
 		unset($d);

@@ -61,7 +61,7 @@ switch ($type) {
 
 		$memory = 40 + strlen($key) + $redis->strLen($key);
 		break;
-	case 'hash'://这里误差会比较大，没有计算实际value的值
+	case 'hash':
 		$values = $redis->hGetAll($key);
 		$entrySize = 0;
 		foreach ($values as $k => $value) {
