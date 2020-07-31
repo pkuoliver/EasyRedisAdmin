@@ -22,7 +22,7 @@ if (isset($_GET['key'])) {
 		// This code assumes $value is not present in the list. 
 		// To make sure of this we would need to check the whole list and place a Watch on it to make sure the list isn't modified in between.
 		$redis->lSet($_GET['key'], $_GET['index'], $value);
-		$redis->lRem($_GET['key'], 1, $value);
+		$redis->lRem($_GET['key'], $value, 1);
 	} else if (($_GET['type'] == 'set') && isset($_GET['value'])) {// Set
 		// Removing members from a set can only be done by supplying the member.
 		$redis->sRem($_GET['key'], $_GET['value']);

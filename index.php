@@ -80,54 +80,9 @@ if($redis) {
 			$calcDetailMem = $config['show_detail_memory'];
 			// Get the number of items in the key.
 			// Mem comsumption algorithom from : https://www.cnblogs.com/kismetv/p/8654978.html
+			// Mem comsumption algorithom v2 from : http://www.redis.cn/commands/memory-usage.html
 			if (!isset($config['faster']) || !$config['faster']) {
-				switch ($redis->type($fullkey)) {
-					case 1: //string
-						$len = 1;
-						if($calcDetailMem) $size = 40 + strlen($fullkey) + $redis->strLen($fullkey);
-						else $size = 40 + strlen($fullkey) + 100; //assume value size is 100
-						break;
-					case 5: //hash
-						$len = $redis->hLen($fullkey);
-						if($calcDetailMem) {
-							$avgEntryMem = 114;
-							/*$iter = null;
-							$scanSize = $len/20 > 5 ? $len/20 : 5;
-							$total = 0; $cnt = 0;
-							while($r = $redis->hScan($fullkey, $iter, '*', $scanSize)) {
-								if($r === false) break;
-								foreach($r as $k) {
-									$vl = $redis->hStrLen($fullkey, $k);
-									$total = $total + (32 + 40 + strlen($k) + $vl);
-									if($vl>39) $total = $total + 40;
-									$cnt++;
-								}
-								//if($cnt >= $scanSize) break;
-							}
-							$avgEntryMem = $total / $cnt;
-							var_dump($avgEntryMem);*/
-							$size = 40 + strlen($fullkey) + 8*calcMaxSize($len) + $len * $avgEntryMem;
-						} else {
-							$size = 40 + strlen($fullkey) + 8*calcMaxSize($len) + $len * 114;
-							//else $size = 40 + strlen($fullkey) + 8*2*$len + $len * 114;
-						}
-						break;
-					case 3: //list
-						$len = $redis->lLen($fullkey);
-						if($calcDetailMem) $size = 40 + strlen($fullkey) + $len * 114;
-						else $size = 40 + strlen($fullkey) + $len * 114;
-						break;
-					case 2: //set
-						$len = $redis->sCard($fullkey);
-						if($calcDetailMem) $size = 40 + strlen($fullkey) + $len * 100;
-						else $size = $size = 40 + strlen($fullkey) + $len * 100;
-						break;
-					case 4: //zset
-						$len = $redis->zCard($fullkey);
-						if($calcDetailMem) $size = 40 + strlen($fullkey) + $len * 114;
-						else $size = $size = 40 + strlen($fullkey) + $len * 114;
-						break;
-				}
+				$size = 40 + strlen($fullkey) + $redis->rawCommand('memory', 'usage', $fullkey);
 			}
 			$totalSize = $size;
 

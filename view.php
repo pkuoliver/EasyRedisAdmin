@@ -71,7 +71,7 @@ switch ($type) {
 			$entrySize = $entrySize + 24 + strlen($k) + strlen($value);
 		}
 		$size = count($values);
-		ksort($values);
+		krsort($values);
 		
 		//        $keyMem             + dicthtMem + bucketMem            + dictEntryMem
 		$memory = 40 + 2*strlen($key) + 4*8       + 8*calcMaxSize($size) + $entrySize;
