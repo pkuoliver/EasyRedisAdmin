@@ -3,6 +3,9 @@ Php实现的Web版Redis管理系统。让Redis管理变得简单。
 
 本项目基于[erikdubbelboer/phpRedisAdmin](https://github.com/ErikDubbelboer/phpRedisAdmin) 1.11.5版本改进而来。phpRedisAdmin是一个很棒的项目，在这里表示感谢。
 
+## 效果示例：
+![avatar](images/demo/sample-001.png)
+
 ## 本项目主要工作：
 
 * 给每个Key和Folder预估内存；

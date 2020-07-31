@@ -3,6 +3,9 @@ Make redis management easier. This project is for redis admin by php. [中文版
 
 This project is based on [erikdubbelboer/phpRedisAdmin](https://github.com/ErikDubbelboer/phpRedisAdmin) Ver1.11.5. phpRedisAdmin is a great project, thanks.
 
+## Demo：
+![avatar](images/demo/sample-001.png)
+
 ## What works did i do
 * Estimated memory consumption for each key and folder.
 * Remove Predis dependency, making it more efficient.
