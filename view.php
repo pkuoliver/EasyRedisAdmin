@@ -110,7 +110,9 @@ switch ($type) {
 		$memory = 40 + 2*strlen($key) + $valSize;
 		break;
 }
-	
+
+$memory2 = $redis->rawCommand('memory', 'usage', $key, 'samples', 9);
+
 if (isset($values) && ($count_elements_page !== false)) {
 	$values = array_slice($values, $count_elements_page * ($page_num_request - 1), $count_elements_page,true);
 }
@@ -130,7 +132,7 @@ if (isset($values) && ($count_elements_page !== false)) {
 	<span class="button btn-info">Encoding: <?php echo format_html($encoding)?></span>
 	<?php } ?>
 	<span class="button btn-primary">Size: <?php echo $size?> <?php echo ($type == 'string') ? 'characters' : 'items'?></span>
-	<span class="button btn-primary">Memory: <?php echo format_size($memory);?></span>
+	<span class="button btn-primary">Memory: <?php echo format_size($memory2);?> / <?php echo format_size($memory);?></span>
 </div>
 
 <h2>Content:</h2>
@@ -194,6 +196,11 @@ if (isset($pagination)) {
 	echo $pagination;
 }
 
+if ($type != 'string') { ?>
+	<p><a href="edit.php?s=<?php echo $server['id']?>&amp;d=<?php echo $server['db']?>&amp;type=<?php echo $type?>&amp;key=<?php echo urlencode($key)?>" class="add">Add another value</a></p>
+	<table>
+<?php }
+
 // String
 if ($type == 'string') { ?>
 
@@ -239,12 +246,9 @@ var jsonString = <?php echo $value; ?>;
 
 <?php }
 
-
-
 // Hash
 else if ($type == 'hash') { ?>
 
-<table>
 <tr><th><div>Key</div></th><th><div>Value</div></th><th><div>&nbsp;</div></th><th><div>&nbsp;</div></th></tr>
 
 <?php foreach ($values as $hkey => $value) { ?>
@@ -261,7 +265,6 @@ else if ($type == 'hash') { ?>
 // List
 else if ($type == 'list') { ?>
 
-<table>
 <tr><th><div>Index</div></th><th><div>Value</div></th><th><div>&nbsp;</div></th><th><div>&nbsp;</div></th></tr>
 
 <?php 
@@ -291,7 +294,7 @@ else if ($type == 'list') { ?>
 else if ($type == 'set') {
 
 ?>
-<table>
+
 <tr><th><div>Value</div></th><th><div>&nbsp;</div></th><th><div>&nbsp;</div></th></tr>
 
 <?php foreach ($values as $value) {
@@ -310,7 +313,6 @@ else if ($type == 'set') {
 // ZSet
 else if ($type == 'zset') { ?>
 
-<table>
 <tr><th><div>Score</div></th><th><div>Value</div></th><th><div>&nbsp;</div></th><th><div>&nbsp;</div></th></tr>
 
 <?php foreach ($values as $value) {
@@ -327,10 +329,7 @@ else if ($type == 'zset') { ?>
 
 if ($type != 'string') { ?>
 	</table>
-
-	<p>
-	<a href="edit.php?s=<?php echo $server['id']?>&amp;d=<?php echo $server['db']?>&amp;type=<?php echo $type?>&amp;key=<?php echo urlencode($key)?>" class="add">Add another value</a>
-	</p>
+	<p><a href="edit.php?s=<?php echo $server['id']?>&amp;d=<?php echo $server['db']?>&amp;type=<?php echo $type?>&amp;key=<?php echo urlencode($key)?>" class="add">Add another value</a></p>
 <?php }
 
 if (isset($pagination)) {
