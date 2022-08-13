@@ -224,6 +224,7 @@ if ($databases > 1) { ?>
 		<?php print_namespace($namespaces, 'Keys', '', empty($namespaces))?>
 	</ul>
 </div><!-- #keys -->
+<br><br>
 
 <?php } else { ?>
 </p>
