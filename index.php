@@ -82,7 +82,7 @@ if($redis) {
 			// Mem comsumption algorithom from : https://www.cnblogs.com/kismetv/p/8654978.html
 			// Mem comsumption algorithom v2 from : http://www.redis.cn/commands/memory-usage.html
 			if (!isset($config['faster']) || !$config['faster']) {
-				$size = 40 + strlen($fullkey) + $redis->rawCommand('memory', 'usage', $fullkey);
+				$size = 40 + strlen($fullkey) + $redis->rawCommand('memory', 'usage', $fullkey, 'samples', 5);
 			}
 			$totalSize = $size;
 

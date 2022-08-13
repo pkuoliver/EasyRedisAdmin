@@ -8,7 +8,6 @@ if (isset($_POST['old'], $_POST['key'])) {
 
 	$redis->rename($_POST['old'], $_POST['key']);
 
-
 	// Refresh the top so the key tree is updated.
 	require 'includes/header.inc.php';
 
