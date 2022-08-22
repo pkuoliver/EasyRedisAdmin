@@ -65,7 +65,7 @@ require 'includes/header.inc.php';
 			<tr><td><div>Port:</div></td><td><div><?php echo $info[$i]['tcp_port']?></div></td></tr>
 			<tr><td><div>Keys:</div></td><td><div><?php echo $info[$i]['size']?></div></td></tr>
 			<tr><td><div>Clients:</div></td><td><div><?php echo $info[$i]['connected_clients']?></div></td></tr>
-			<tr><td><div>Memory</div></td><td><div><?php echo format_size($info[$i]['used_memory'])?></div></td></tr>
+			<tr><td><div>Mem/Ratio</div></td><td><div><?php echo format_size($info[$i]['used_memory']) . '/' . $info[$i]['mem_fragmentation_ratio']?></div></td></tr>
 			<tr><td><div>Version:</div></td><td><div><?php echo $info[$i]['redis_version']?></div></td></tr>
 			<tr><td><div>Uptime:</div></td><td><div><?php echo format_time($info[$i]['uptime_in_seconds'])?></div></td></tr>
 			<tr><td><div style="min-width:70px;">Last save:</div></td><td><div style="min-width:100px;">
@@ -81,7 +81,10 @@ require 'includes/header.inc.php';
 				}
 			?>
 			</div></td></tr>
-			<tr><td><div>Save:</div></td><td><div><a href="save.php?s=<?php echo $i?>"><img src="images/save.png" width="16" height="16" title="Save Now" alt="[S]" class="imgbut"></a></div></td></tr>
+			<tr><td><div>Operation:</div></td><td><div>
+				<a href="save.php?s=<?php echo $i?>"><img src="images/save.png" width="16" height="16" title="Save Now" alt="[S]" class="imgbut"></a> | 
+				<a href="info.php?s=<?php echo $i?>"><img src="images/info.png" width="16" height="16" title="Redis Info" alt="[S]" class="imgbut"></a>
+			</div></td></tr>
 		</table>
 		<?php endif; ?>
 	</div>
