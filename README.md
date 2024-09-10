@@ -25,7 +25,7 @@ or
 wget https://github.com/pkuoliver/EasyRedisAdmin/archive/master.zip
 unzip master.zip
 ~~~
-After installed, you can copy includes/config.sample.inc.php and edit your instance information and longin info.
+After installed, you can edit config.sample.php and add your instance information and login info.
 
 ## TODO
 * Optimize UI presentation and improve the convenience of CURD operations.

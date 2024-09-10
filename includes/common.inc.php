@@ -24,10 +24,10 @@ if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc()) {
 
 
 // These includes are needed by each script.
-if(file_exists(EASY_REDIS_ADMIN_PATH . '/includes/config.inc.php')){
-	require_once EASY_REDIS_ADMIN_PATH . '/includes/config.inc.php';
+if(file_exists(EASY_REDIS_ADMIN_PATH . '/config.php')){
+	require_once EASY_REDIS_ADMIN_PATH . '/config.php';
 }else{
-	require_once EASY_REDIS_ADMIN_PATH . '/includes/config.sample.inc.php';
+	require_once EASY_REDIS_ADMIN_PATH . '/config.sample.php';
 }
 require_once EASY_REDIS_ADMIN_PATH . '/includes/functions.inc.php';
 require_once EASY_REDIS_ADMIN_PATH . '/includes/page.inc.php';
